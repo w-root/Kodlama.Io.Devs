@@ -1,5 +1,12 @@
-﻿using Application.Features.ProgrammingLanguageFeature.Commands.CreateProgrammingLanguage;
+﻿using Application.Features.Brands.Dtos;
+using Application.Features.ProgrammingLanguageFeature.Commands.CreateProgrammingLanguage;
+using Application.Features.ProgrammingLanguageFeature.Commands.DeleteProgrammingLanguage;
+using Application.Features.ProgrammingLanguageFeature.Commands.UpdateProgrammingLanguage;
 using Application.Features.ProgrammingLanguageFeature.Dtos;
+using Application.Features.ProgrammingLanguageFeature.Models;
+using Application.Features.ProgrammingLanguageFeature.Queries.GetByIdProgrammingLanguageQuery;
+using Application.Features.ProgrammingLanguageFeature.Queries.GetListProgrammingLanguage;
+using Core.Application.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +16,19 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ProgrammingLanguagesController : BaseController
     {
+        [HttpGet]
+        public async Task<IActionResult> GetList([FromQuery] GetListProgrammingLanguage getListProgrammingLanguageQuery)
+        {
+            ProgrammingLanguageListModel result = await Mediator.Send(getListProgrammingLanguageQuery);
+            return Ok(result);
+        }
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetById([FromRoute] GetByIdProgrammingLanguageQuery getByIdProgrammingLanguageQuery)
+        {
+            ProgrammingLanguageGetByIdDto result = await Mediator.Send(getByIdProgrammingLanguageQuery);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] CreateProgrammingLanguageCommand createProgrammingLanguageCommand)
         {
@@ -29,6 +49,8 @@ namespace WebAPI.Controllers
            UpdatedProgrammingLanguageDto result = await Mediator.Send(updateProgrammingLanguageCommand);
             return Ok(result);
         }
+
+
 
     }
 }

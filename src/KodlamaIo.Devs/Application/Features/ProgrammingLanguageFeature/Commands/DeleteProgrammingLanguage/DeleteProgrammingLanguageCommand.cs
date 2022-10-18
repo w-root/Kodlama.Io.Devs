@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Features.ProgrammingLanguageFeature.Commands.CreateProgrammingLanguage
+namespace Application.Features.ProgrammingLanguageFeature.Commands.DeleteProgrammingLanguage
 {
     public class DeleteProgrammingLanguageCommand : IRequest<DeletedProgrammingLanguageDto>
     {
