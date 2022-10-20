@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Features.Brands.Dtos
+namespace Application.Features.ProgrammingLanguageFeature.Dtos
 {
     public class ProgrammingLanguageListDto
     {
