@@ -3,6 +3,7 @@ using AutoMapper;
 using Core.Persistence.Paging;
 using Core.Security.Entities;
 using Core.Security.JWT;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,12 +32,14 @@ namespace Application.Services.Auth
 
         public async Task<AccessToken> CreateAccessToken(User user)
         {
-            IPaginate<UserOperationClaim> userOperationClaims = await _userOperationClaimRepository.
-                GetListAsync(o => o.UserId == user.Id);
+            IPaginate<UserOperationClaim> userOperationClaims = await _userOperationClaimRepository
+                .GetListAsync(u => u.UserId == user.Id,
+             include: u => u.Include(u => u.OperationClaim));
 
-            IList<OperationClaim> operationClaims = userOperationClaims.Items.
-                Select(u => new OperationClaim { Id = u.OperationClaim.Id, Name = u.OperationClaim.Name }).ToList();
-            
+            IList<OperationClaim> operationClaims =
+                userOperationClaims.Items.Select(u => new OperationClaim { Id = u.OperationClaim.Id, Name = u.OperationClaim.Name })
+                .ToList();
+
             AccessToken token = _tokenHelper.CreateToken(user,operationClaims);
             return token;
         }

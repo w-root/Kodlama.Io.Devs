@@ -21,8 +21,7 @@ namespace Persistence.Contexts
         public DbSet<UserOperationClaim> UserOperationClaims { get; set; }
         public DbSet<OperationClaim> OperationClaims { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-
-
+        public DbSet<GithubProfile> GithubProfiles { get; set; }
 
         public BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration) : base(dbContextOptions)
         {
@@ -53,7 +52,7 @@ namespace Persistence.Contexts
 
             Technology[] technologyEntitySeeds = { new(1,1,"Django"), new(2,2, "Spring") , new(3,4, "Asp.net") };
             modelBuilder.Entity<Technology>().HasData(technologyEntitySeeds);
-
+            
         }
     }
 }
