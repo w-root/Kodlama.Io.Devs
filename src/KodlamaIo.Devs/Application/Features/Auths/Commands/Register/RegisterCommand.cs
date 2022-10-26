@@ -19,11 +19,15 @@ namespace Application.Features.Auths.Commands.Register
             private readonly IAuthService _authService;
             private readonly IUserRepository _userRepository;
             private readonly AuthBusinessRules _authBusinessRules;
-            public RegisterCommandHandler(IAuthService authService, IUserRepository userRepository,AuthBusinessRules authBusinessRules)
+            private readonly IUserOperationClaimRepository _userOperationClaimRepository;
+
+            public RegisterCommandHandler(IAuthService authService, IUserRepository userRepository,AuthBusinessRules authBusinessRules,
+                IUserOperationClaimRepository userOperationClaimRepository)
             {
                 _authService = authService;
                 _userRepository = userRepository;
                 _authBusinessRules = authBusinessRules;
+                _userOperationClaimRepository = userOperationClaimRepository;
             }
 
             public async Task<RegisteredDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -42,7 +46,10 @@ namespace Application.Features.Auths.Commands.Register
                     PasswordSalt = passwordSalt,
                     Status = true,
                 };
-                await _userRepository.AddAsync(user);
+                User addedUser = await _userRepository.AddAsync(user);
+
+                UserOperationClaim userOperationClaim = new() { OperationClaimId = 1, UserId = addedUser.Id };
+                await _userOperationClaimRepository.AddAsync(userOperationClaim);
 
                 AccessToken accessToken = await _authService.CreateAccessToken(user);
                 RefreshToken refreshToken = await _authService.CreateRefreshToken(user, request.IpAdress);

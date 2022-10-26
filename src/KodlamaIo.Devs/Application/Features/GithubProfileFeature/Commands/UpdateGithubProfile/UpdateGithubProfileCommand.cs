@@ -1,7 +1,9 @@
 ﻿using Application.Features.GithubProfileFeature.Commands.DeleteGithubProfile;
 using Application.Features.GithubProfileFeature.Dtos;
+using Application.Features.GithubProfileFeature.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
+using Core.Application.Pipelines.Authorization;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -13,26 +15,33 @@ using System.Threading.Tasks;
 
 namespace Application.Features.GithubProfileFeature.Commands.UpdateGithubProfile
 {
-    public class UpdateGithubProfileCommand : IRequest<UpdatedGithubProfileDto>
+    public class UpdateGithubProfileCommand : IRequest<UpdatedGithubProfileDto>, ISecuredRequest
     {
         public int Id { get; set; }
         public string Github { get; set; }
+        public string[] Roles => new[] { "User" };
+
         public class UpdateGithubProfileCommandHandler : IRequestHandler<UpdateGithubProfileCommand, UpdatedGithubProfileDto>
         {
-            private readonly IHttpContextAccessor _httpContextAccessor;
+            private readonly IMapper _mapper;
+            private readonly IGithubProfileRepository _githubProfileRepository;
+            private readonly GithubProfileRules _githubProfileRules;
 
-            IMapper _mapper;
-            IGithubProfileRepository _githubProfileRepository;
             public UpdateGithubProfileCommandHandler(IMapper mapper, IGithubProfileRepository githubProfileRepository,
-                IHttpContextAccessor httpContextAccessor)
+                GithubProfileRules githubProfileRules)
             {
                 _mapper = mapper;
                 _githubProfileRepository = githubProfileRepository;
-                _httpContextAccessor = httpContextAccessor;
+                _githubProfileRules = githubProfileRules;
             }
             public async Task<UpdatedGithubProfileDto> Handle(UpdateGithubProfileCommand request, CancellationToken cancellationToken)
             {
-                GithubProfile githubProfile = _mapper.Map<GithubProfile>(request);
+                GithubProfile? githubProfile = await _githubProfileRepository.GetAsync(g => g.Id == request.Id);
+
+                _githubProfileRules.UserCanOnlyUpdateAndDeleteGithubAddresTheyOwn(githubProfile);
+                _githubProfileRules.GithubProfileShouldExistWhenRequested(githubProfile);
+
+                githubProfile.Github = request.Github;
                 GithubProfile updatedGithubProfile = await _githubProfileRepository.UpdateAsync(githubProfile);
                 UpdatedGithubProfileDto updatedGithubProfileDto = _mapper.Map<UpdatedGithubProfileDto>(updatedGithubProfile);
                 return updatedGithubProfileDto;

@@ -1,6 +1,8 @@
 ﻿using Application.Features.GithubProfileFeature.Dtos;
+using Application.Features.GithubProfileFeature.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
+using Core.Application.Pipelines.Authorization;
 using Core.CrossCuttingConcerns.Exceptions;
 using Core.Security.Extensions;
 using Domain.Entities;
@@ -20,25 +22,24 @@ namespace Application.Features.GithubProfileFeature.Commands.CreateGithubProfile
 
         public class CreateGithubProfileCommandHandler : IRequestHandler<CreateGithubProfileCommand, CreatedGithubProfileDto>
         {
-            private readonly IHttpContextAccessor _httpContextAccessor;
+            private readonly IMapper _mapper;
+            private readonly IGithubProfileRepository _githubProfileRepository;
+            private readonly GithubProfileRules _githubProfileRules;
 
-            IMapper _mapper;
-            IGithubProfileRepository _githubProfileRepository;
-            public CreateGithubProfileCommandHandler(IMapper mapper,IGithubProfileRepository githubProfileRepository, 
-                IHttpContextAccessor httpContextAccessor)
+            public CreateGithubProfileCommandHandler(IMapper mapper,IGithubProfileRepository githubProfileRepository,
+                GithubProfileRules githubProfileRules)
             {
                 _mapper = mapper;
                 _githubProfileRepository = githubProfileRepository;
-                _httpContextAccessor = httpContextAccessor;
+                _githubProfileRules = githubProfileRules;
             }
             public async Task<CreatedGithubProfileDto> Handle(CreateGithubProfileCommand request, CancellationToken cancellationToken)
             {
-                GithubProfile githubProfile = _mapper.Map<GithubProfile>(request);
-                int id = _httpContextAccessor.HttpContext.User.GetUserId();
-                if(id == 0)
-                    throw new BusinessException("Please Login");
+                int userId = _githubProfileRules.GetUserId();
+                await _githubProfileRules.GithubProfileCanNotBeDuplicatedWhenCreated(userId);
 
-                githubProfile.UserId = id;
+                GithubProfile githubProfile = _mapper.Map<GithubProfile>(request);
+                githubProfile.UserId = userId;
 
                 GithubProfile addedGithubProfile = await _githubProfileRepository.AddAsync(githubProfile);
                 CreatedGithubProfileDto createdGithubProfileDto = _mapper.Map<CreatedGithubProfileDto>(addedGithubProfile);
