@@ -1,5 +1,6 @@
 ﻿using Application.Features.OperationClaimFeature.Commands.CreateOperationClaim;
 using Application.Features.OperationClaimFeature.Dtos;
+using Application.Features.OperationClaimFeature.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Application.Pipelines.Authorization;
@@ -23,16 +24,23 @@ namespace Application.Features.OperationClaimFeature.Commands.DeleteOperationCla
         {
             IOperationClaimRepository _operationClaimRepository;
             IMapper _mapper;
+            OperationClaimsRules _operationClaimsRules;
 
-            public DeleteOperationClaimCommandHandler(IOperationClaimRepository operationClaimRepository, IMapper mapper)
+            public DeleteOperationClaimCommandHandler(IOperationClaimRepository operationClaimRepository, IMapper mapper,
+                OperationClaimsRules operationClaimsRules)
             {
                 _operationClaimRepository = operationClaimRepository;
                 _mapper = mapper;
+                _operationClaimsRules = operationClaimsRules;
             }
+
 
             public async Task<DeletedOperationClaimDto> Handle(DeleteOperationClaimCommand request, CancellationToken cancellationToken)
             {
-                OperationClaim operationClaim = _mapper.Map<OperationClaim>(request);
+                OperationClaim? operationClaim = await _operationClaimRepository.GetAsync(g => g.Id == request.Id);
+
+                _operationClaimsRules.OperationClaimShouldExistWhenRequested(operationClaim);
+
                 OperationClaim deletedOperationClaim = await _operationClaimRepository.DeleteAsync(operationClaim);
                 DeletedOperationClaimDto mappedOperationClaim = _mapper.Map<DeletedOperationClaimDto>(deletedOperationClaim);
                 return mappedOperationClaim;

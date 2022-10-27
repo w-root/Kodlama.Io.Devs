@@ -1,6 +1,8 @@
 ﻿using Application.Features.Auths.Rules;
 using Application.Features.GithubProfileFeature.Rules;
+using Application.Features.OperationClaimFeature.Rules;
 using Application.Features.ProgrammingLanguageFeature.Rules;
+using Application.Features.UserOperationClaimFeature.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
 using Core.Application.Pipelines.Authorization;
@@ -27,6 +29,8 @@ namespace Application
             services.AddScoped<ProgrammingLanguagesRules>();
             services.AddScoped<AuthBusinessRules>();
             services.AddScoped<GithubProfileRules>();
+            services.AddScoped<UserOperationClaimRules>();
+            services.AddScoped<OperationClaimsRules>();
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));

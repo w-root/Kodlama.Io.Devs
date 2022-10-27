@@ -1,5 +1,5 @@
 ﻿using Application.Features.OperationClaimFeature.Dtos;
-using Application.Features.ProgrammingLanguageFeature.Dtos;
+using Application.Features.OperationClaimFeature.Rules;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Application.Pipelines.Authorization;
@@ -24,15 +24,20 @@ namespace Application.Features.OperationClaimFeature.Commands.CreateOperationCla
         {
             IOperationClaimRepository _operationClaimRepository;
             IMapper _mapper;
+            OperationClaimsRules _operationClaimsRules;
 
-            public CreateOperationClaimCommandHandler(IOperationClaimRepository operationClaimRepository, IMapper mapper)
+            public CreateOperationClaimCommandHandler(IOperationClaimRepository operationClaimRepository, IMapper mapper,
+                OperationClaimsRules operationClaimsRules)
             {
                 _operationClaimRepository = operationClaimRepository;
                 _mapper = mapper;
+                _operationClaimsRules = operationClaimsRules;
             }
 
             public async Task<CreatedOperationClaimDto> Handle(CreateOperationClaimCommand request, CancellationToken cancellationToken)
             {
+                await _operationClaimsRules.OperationClaimNameCanNotBeDuplicatedWhenCreated(request.Name);
+
                 OperationClaim operationClaim = _mapper.Map<OperationClaim>(request);
                 OperationClaim createdoperationClaim = await _operationClaimRepository.AddAsync(operationClaim);
                 CreatedOperationClaimDto mappedOperationClaim = _mapper.Map<CreatedOperationClaimDto>(createdoperationClaim);
