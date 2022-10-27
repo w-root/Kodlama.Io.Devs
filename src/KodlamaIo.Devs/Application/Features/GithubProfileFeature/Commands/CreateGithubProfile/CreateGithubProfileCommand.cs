@@ -16,9 +16,11 @@ using System.Threading.Tasks;
 
 namespace Application.Features.GithubProfileFeature.Commands.CreateGithubProfile
 {
-    public class CreateGithubProfileCommand : IRequest<CreatedGithubProfileDto>
+    public class CreateGithubProfileCommand : IRequest<CreatedGithubProfileDto>, ISecuredRequest
     {
         public string Github { get; set; }
+        public string[] Roles => new[] { "User" };
+
 
         public class CreateGithubProfileCommandHandler : IRequestHandler<CreateGithubProfileCommand, CreatedGithubProfileDto>
         {

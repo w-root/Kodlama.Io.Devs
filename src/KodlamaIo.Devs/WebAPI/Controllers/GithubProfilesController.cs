@@ -10,7 +10,7 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GithubProfileController : BaseController
+    public class GithubProfilesController : BaseController
     {
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] CreateGithubProfileCommand createGithubProfileCommand)
@@ -23,14 +23,14 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Update([FromBody] UpdateGithubProfileCommand updateGithubProfileCommand)
         {
             UpdatedGithubProfileDto result = await Mediator.Send(updateGithubProfileCommand);
-            return Created("", result);
+            return Ok(result);
         }       
 
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody] DeleteGithubProfileCommand deleteGithubProfileCommand)
         {
             DeletedGithubProfileDto result = await Mediator.Send(deleteGithubProfileCommand);
-            return Created("", result);
+            return Ok(result);
         }
     }
 }
