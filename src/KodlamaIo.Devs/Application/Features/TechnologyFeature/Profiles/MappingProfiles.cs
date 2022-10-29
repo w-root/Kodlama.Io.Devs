@@ -25,8 +25,15 @@ namespace Application.Features.TechnologyFeature.Profiles
             CreateMap<Technology, DeletedTechnologyDto>().ReverseMap();
             CreateMap<Technology, UpdatedTechnologyDto>().ReverseMap();
             CreateMap<IPaginate<Technology>, TechnologyListModel>().ReverseMap();
-            CreateMap<Technology, TechnologyListDto>().ForMember(c => c.ProgrammingLanguageName, opt => opt.MapFrom(c => c.ProgrammingLanguage.Name)).ReverseMap();
-            CreateMap<Technology, TechnologyGetByIdDto>().ReverseMap();
+            CreateMap<Technology, TechnologyListDto>()
+                .ForMember(c => c.ProgrammingLanguageId, opt => opt.MapFrom(c => c.ProgrammingLanguage.Id))
+                .ForMember(c => c.ProgrammingLanguageName, opt => opt.MapFrom(c => c.ProgrammingLanguage.Name))
+                .ReverseMap();
+            
+            CreateMap<Technology, TechnologyGetByIdDto>()
+                .ForMember(c => c.ProgrammingLanguageId, opt => opt.MapFrom(c => c.ProgrammingLanguage.Id))
+                .ForMember(c => c.ProgramminLanguageName, opt => opt.MapFrom(c => c.ProgrammingLanguage.Name))
+                .ReverseMap();
 
 
         }

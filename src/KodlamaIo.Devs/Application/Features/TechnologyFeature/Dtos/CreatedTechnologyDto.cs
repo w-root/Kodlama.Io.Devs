@@ -11,7 +11,6 @@ namespace Application.Features.TechnologyFeature.Dtos
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ProgrammingLanguage ProgrammingLanguage { get; set; }
 
     }
 }
